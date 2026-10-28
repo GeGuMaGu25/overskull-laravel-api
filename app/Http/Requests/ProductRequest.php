@@ -24,9 +24,9 @@ class ProductRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:150'],
             'description' => ['nullable', 'string', 'max:1000'],
-            'price' => ['required', 'numeric', 'gt:0', 'max:99999999.99'],
-            'stock' => ['required', 'integer', 'min:0'],
-            'category_id' => ['required', 'integer', 'exists:categories,id'],
+            'price' => ['bail', 'required', 'numeric', 'gt:0', 'max:99999999.99'],
+            'stock' => ['bail', 'required', 'integer', 'min:0'],
+            'category_id' => ['bail', 'required', 'integer', 'exists:categories,id'],
         ];
     }
 
