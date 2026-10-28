@@ -16,6 +16,81 @@
         }
     ],
     "paths": {
+        "/api/activity-logs": {
+            "get": {
+                "tags": [
+                    "Auditoría"
+                ],
+                "summary": "Listar el log de auditoría",
+                "description": "Devuelve las últimas acciones (create / update / delete) registradas sobre productos y categorías.",
+                "operationId": "listActivityLogs",
+                "parameters": [
+                    {
+                        "name": "log_name",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "product",
+                                "category"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "event",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "created",
+                                "updated",
+                                "deleted"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 50,
+                            "maximum": 200
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Registros de auditoría",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Registros de auditoría obtenidos correctamente"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ActivityLog"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/categories": {
             "get": {
                 "tags": [
@@ -784,6 +859,50 @@
                     }
                 },
                 "type": "object"
+            },
+            "ActivityLog": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "log_name": {
+                        "type": "string",
+                        "example": "product"
+                    },
+                    "event": {
+                        "type": "string",
+                        "example": "updated"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Producto actualizado"
+                    },
+                    "subject_type": {
+                        "type": "string",
+                        "example": "Product"
+                    },
+                    "subject_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "changes": {
+                        "type": "object",
+                        "example": {
+                            "attributes": {
+                                "price": "99.90"
+                            },
+                            "old": {
+                                "price": "89.90"
+                            }
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "example": "2026-10-28 15:00:00"
+                    }
+                },
+                "type": "object"
             }
         }
     },
@@ -795,6 +914,10 @@
         {
             "name": "Productos",
             "description": "CRUD de productos"
+        },
+        {
+            "name": "Auditoría",
+            "description": "Registro de acciones sobre productos y categorías"
         }
     ]
 }
