@@ -17,6 +17,7 @@ use OpenApi\Attributes as OA;
 #[OA\Server(url: L5_SWAGGER_CONST_HOST, description: 'Servidor principal')]
 #[OA\Tag(name: 'Categorías', description: 'CRUD de categorías')]
 #[OA\Tag(name: 'Productos', description: 'CRUD de productos')]
+#[OA\Tag(name: 'Auditoría', description: 'Registro de acciones sobre productos y categorías')]
 #[OA\Schema(
     schema: 'Category',
     properties: [
@@ -87,6 +88,23 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'success', type: 'boolean', example: false),
         new OA\Property(property: 'message', type: 'string', example: 'No se puede eliminar una categoría que tiene productos asociados'),
         new OA\Property(property: 'errors', type: 'object', nullable: true, example: null),
+    ]
+)]
+#[OA\Schema(
+    schema: 'ActivityLog',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'log_name', type: 'string', example: 'product'),
+        new OA\Property(property: 'event', type: 'string', example: 'updated'),
+        new OA\Property(property: 'description', type: 'string', example: 'Producto actualizado'),
+        new OA\Property(property: 'subject_type', type: 'string', example: 'Product'),
+        new OA\Property(property: 'subject_id', type: 'integer', example: 1),
+        new OA\Property(
+            property: 'changes',
+            type: 'object',
+            example: ['attributes' => ['price' => '99.90'], 'old' => ['price' => '89.90']],
+        ),
+        new OA\Property(property: 'created_at', type: 'string', example: '2026-10-28 15:00:00'),
     ]
 )]
 class OpenApiSpec {}
