@@ -1,0 +1,64 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: overskull-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: overskull_db
+      DB_USERNAME: overskull
+      DB_PASSWORD: secret
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - overskull
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: overskull-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - overskull
+
+  mysql:
+    image: mysql:8.0
+    container_name: overskull-mysql
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: overskull_db
+      MYSQL_USER: overskull
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - overskull
+
+networks:
+  overskull:
+    driver: bridge
+
+volumes:
+  mysql-data:

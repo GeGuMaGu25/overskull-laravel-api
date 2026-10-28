@@ -1,66 +1,204 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Overskull – API REST (Laravel 11)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API REST para la gestión de **productos** y **categorías** (CRUD completo), con respuestas JSON estandarizadas, validaciones, documentación Swagger, auditoría de acciones y observabilidad con Laravel Telescope.
 
-## About Laravel
+Frontend: [overskull-vue-frontend](https://github.com/GeGuMaGu25/overskull-vue-frontend)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tecnologías
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Herramienta | Uso |
+|---|---|
+| Laravel 11 | Framework backend |
+| MySQL 8 | Base de datos |
+| darkaonline/l5-swagger (swagger-php) | Documentación OpenAPI en `/api/docs` |
+| Laravel Telescope | Observabilidad (requests, queries, excepciones) |
+| spatie/laravel-activitylog | Auditoría de create / update / delete |
+| PHPUnit | Pruebas de feature |
+| Docker (opcional) | PHP-FPM + Nginx + MySQL |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Requisitos previos
 
-## Learning Laravel
+- PHP **8.2** o superior con las extensiones `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json` (y `pdo_sqlite` para correr los tests)
+- Composer 2
+- MySQL 8 (o MariaDB 10.6+)
+- Git
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+> También puedes levantar todo con Docker sin instalar PHP ni MySQL (ver más abajo).
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Instalación local
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+git clone https://github.com/GeGuMaGu25/overskull-laravel-api.git
+cd overskull-laravel-api
 
-## Laravel Sponsors
+composer install
+cp .env.example .env          # en Windows (PowerShell): copy .env.example .env
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Crea la base de datos vacía `overskull_db` en MySQL y revisa las credenciales en `.env`:
 
-### Premium Partners
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=overskull_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Ejecuta las migraciones con datos de ejemplo y levanta el servidor:
 
-## Contributing
+```bash
+php artisan migrate --seed
+php artisan serve
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## URLs base
 
-## Code of Conduct
+| Recurso | URL |
+|---|---|
+| API | http://localhost:8000/api |
+| Documentación Swagger | http://localhost:8000/api/docs |
+| JSON OpenAPI | http://localhost:8000/docs |
+| Laravel Telescope | http://localhost:8000/telescope |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Endpoints
 
-## Security Vulnerabilities
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/categories` | Listar categorías (incluye `products_count`) |
+| POST | `/api/categories` | Crear categoría |
+| GET | `/api/categories/{id}` | Ver categoría |
+| PUT/PATCH | `/api/categories/{id}` | Actualizar categoría |
+| DELETE | `/api/categories/{id}` | Eliminar categoría (409 si tiene productos) |
+| GET | `/api/products` | Listar productos (`?search=` y `?category_id=`) |
+| POST | `/api/products` | Crear producto |
+| GET | `/api/products/{id}` | Ver producto |
+| PUT/PATCH | `/api/products/{id}` | Actualizar producto |
+| DELETE | `/api/products/{id}` | Eliminar producto |
+| GET | `/api/activity-logs` | Log de auditoría (`?log_name=product\|category`, `?event=`, `?limit=`) |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Ejemplo de cuerpo para crear un producto:
 
-## License
+```json
+{
+  "name": "Camiseta Overskull",
+  "description": "Camiseta negra edición limitada",
+  "price": 89.90,
+  "stock": 50,
+  "category_id": 1
+}
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Formato de respuesta estándar
+
+Respuesta exitosa:
+
+```json
+{
+  "success": true,
+  "message": "Producto creado correctamente",
+  "data": { "id": 1, "name": "Camiseta Overskull", "price": 89.9 }
+}
+```
+
+Respuesta de error:
+
+```json
+{
+  "success": false,
+  "message": "El campo nombre es requerido",
+  "errors": { "name": ["El campo nombre es requerido"] }
+}
+```
+
+## Manejo de errores
+
+Todas las excepciones de las rutas `api/*` pasan por `App\Exceptions\ApiExceptionRenderer` (registrado en `bootstrap/app.php`) y se devuelven con el formato estándar:
+
+| Código | Caso |
+|---|---|
+| 422 | Error de validación (`errors` contiene el detalle por campo) |
+| 404 | Recurso o ruta inexistente |
+| 405 | Método HTTP no permitido |
+| 409 | Conflicto (por ejemplo, eliminar una categoría con productos) |
+| 500 | Error interno (el detalle solo se muestra con `APP_DEBUG=true`) |
+
+Además, el middleware `ForceJsonResponse` obliga a que las rutas de la API respondan siempre en JSON aunque el cliente no envíe `Accept: application/json`.
+
+## Auditoría
+
+Los modelos `Product` y `Category` usan el trait `LogsActivity` de Spatie, por lo que cada creación, actualización y eliminación queda registrada en la tabla `activity_log` con los valores anteriores y nuevos. Se pueden consultar desde `GET /api/activity-logs`.
+
+## Telescope
+
+Está habilitado en entorno `local` (`TELESCOPE_ENABLED=true`). Después de hacer algunas peticiones a la API, entra a `/telescope` para ver requests, queries SQL, modelos y excepciones.
+
+## Documentación Swagger
+
+Los endpoints se documentan con atributos de `swagger-php` directamente en los controladores, y los esquemas reutilizables están en `app/OpenApi/OpenApiSpec.php`. Con `L5_SWAGGER_GENERATE_ALWAYS=true` la documentación se regenera en cada carga; también puede generarse manualmente:
+
+```bash
+php artisan l5-swagger:generate
+```
+
+## Estructura del proyecto
+
+```
+app/
+├─ Exceptions/
+│  ├─ ApiExceptionRenderer.php        # Errores → JSON estándar
+│  └─ CategoryHasProductsException.php
+├─ Http/
+│  ├─ Controllers/Api/                # Controladores delgados (solo HTTP)
+│  ├─ Middleware/ForceJsonResponse.php
+│  ├─ Requests/                       # Validaciones (Form Requests)
+│  └─ Resources/                      # Transformación de modelos a JSON
+├─ Models/                            # Category, Product (+ auditoría)
+├─ OpenApi/OpenApiSpec.php            # Info y esquemas de Swagger
+├─ Services/                          # Lógica de negocio
+└─ Support/ApiResponse.php            # Constructor del formato de respuesta
+database/
+├─ factories/
+├─ migrations/
+└─ seeders/                           # CategorySeeder, ProductSeeder
+routes/api.php
+tests/Feature/                        # Pruebas de la API
+docker/                               # Configuración de Nginx y PHP
+docker-compose.yml
+```
+
+Cada capa tiene una sola responsabilidad (SRP): el **Form Request** valida, el **Service** aplica la lógica de negocio, el **Resource** da forma a la salida, `ApiResponse` construye el sobre JSON y el **Controller** solo orquesta.
+
+## Pruebas
+
+```bash
+php artisan test
+```
+
+Las pruebas usan SQLite en memoria, por lo que no tocan tu base de datos MySQL.
+
+## Docker (opcional)
+
+Levanta PHP-FPM, Nginx y MySQL:
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+docker compose exec app composer install
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate --seed
+```
+
+La API queda disponible en http://localhost:8000 y MySQL se expone en el puerto `3307` (usuario `overskull`, contraseña `secret`). Las variables de conexión del contenedor se definen en `docker-compose.yml` y tienen prioridad sobre el `.env`.
+
+Para detener los servicios:
+
+```bash
+docker compose down
+```
+
+## Flujo de trabajo Git
+
+El repositorio sigue **Git Flow** (`main`, `develop`, `feature/*`, `release/*`) y **Conventional Commits** (`feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`).
