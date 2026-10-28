@@ -22,7 +22,7 @@ class ApiResponse
             'success' => true,
             'message' => $message,
             'data' => $data,
-        ], $status);
+        ], $status, [], JSON_UNESCAPED_UNICODE);
     }
 
     public static function created(mixed $data = null, string $message = 'Recurso creado correctamente'): JsonResponse
@@ -39,6 +39,6 @@ class ApiResponse
             'success' => false,
             'message' => $message,
             'errors' => $errors,
-        ], $status);
+        ], $status, [], JSON_UNESCAPED_UNICODE);
     }
 }
